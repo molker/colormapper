@@ -37,9 +37,9 @@ def createColorMap(orgcolorlist, newcolorlist):
             colormap[orgcolorlist[i]] = newcolorlist[i]
     return colormap    
 
-def runColorMapper(orgfolder, inputfolder, backFolder =""):
+def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder=""):
     
-    inputfolder = os.path.join(inputfolder, backFolder)
+    inputfolder = os.path.join(inputfolder,expFolder, backFolder)
 
     filesToProcess = {}
     for file in os.listdir(inputfolder):
@@ -58,10 +58,8 @@ def runColorMapper(orgfolder, inputfolder, backFolder =""):
     for id, variants in filesToProcess.items():
         colormapcollection = {}
         # use exp folder for mega/gigantamax
-        if (len(id) > 5):
-            orgimagepath = (os.path.join(orgfolder, 'exp',backFolder, (id+".png")))
-        else:
-            orgimagepath = (os.path.join(orgfolder,backFolder, (id+".png")))
+        orgimagepath = (os.path.join(orgfolder, expFolder ,backFolder, (id+".png")))
+        
 
         orgcolorlist = getColoredPixels(Image.open(orgimagepath))
 
@@ -83,6 +81,8 @@ orgfolder = (config['CONFIG']['originalfolder'])
 
 runColorMapper(orgfolder,inputfolder)
 runColorMapper(orgfolder, inputfolder,backFolder="back")
+runColorMapper(orgfolder, inputfolder,expFolder="exp")
+runColorMapper(orgfolder, inputfolder,expFolder="exp", backFolder="back")
 
 
 
