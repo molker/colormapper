@@ -1,5 +1,7 @@
 input/*.json
 input/*/*.json
+input/*/*/*.json
 input/*.png
 input/*/*.png
+input/*/*/*.png
 config.ini
