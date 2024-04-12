@@ -16,8 +16,10 @@ def getColoredPixels(img):
                 newhex = rgb2hex(r, g, b)
                 newhex = newhex[1:]
                 tempcolorlist.append(newhex)
+        img.close()
         return tempcolorlist
     else:
+        img.close()
         raise ValueError('This image does not have transparancy')
 
 
