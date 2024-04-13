@@ -23,16 +23,18 @@ def getColoredPixels(img):
         raise ValueError('This image does not have transparancy')
 
 
-def createColorMap(orgcolorlist, newcolorlist):
+def createColorMap(orgcolorlist, newcolorlist,name):
     if len(orgcolorlist) != len(newcolorlist):
-        raise ValueError('images for #'+name+' do not have matching amount of nontransparant pixels org: ' +
+        print('images for #'+name+' do not have matching amount of nontransparant pixels org: ' +
                          str(len(orgcolorlist))+' new: '+str(len(newcolorlist)))
+        return False
     colormap = {}
     for i in range(len(orgcolorlist)):
         if (orgcolorlist[i] in colormap):
             if (colormap[orgcolorlist[i]] != newcolorlist[i]):
-                raise ValueError(orgcolorlist[i] + ' is already mapped to ' +
+                print(orgcolorlist[i] + ' is already mapped to ' +
                                  colormap[orgcolorlist[i]] + ' but tried to also map to: ' + newcolorlist[i])
+                return False
         else:
             colormap[orgcolorlist[i]] = newcolorlist[i]
     return colormap    
@@ -47,6 +49,7 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder=""):
         if filename.endswith(".png"):
             idvariant = re.findall(r"([0-9]+[^_.]*)", filename)
             id = idvariant[0]
+            masterlist[id] = [0,0,0]
             variant = idvariant[1]
 
             if (id in filesToProcess):
@@ -66,8 +69,12 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder=""):
         for variant in variants:
             inputimagepath = (os.path.join(inputfolder, (id+"_"+variant+".png")))
             newcolorlist = getColoredPixels(Image.open(inputimagepath))
-            colormapcollection[int(
-                variant)-1] = createColorMap(orgcolorlist, newcolorlist)
+            tempcolormap = createColorMap(orgcolorlist, newcolorlist,id)
+            if tempcolormap:
+                colormapcollection[int(variant)-1] = tempcolormap
+                masterlist[id][int(variant)-1]=1
+            else:
+                masterlist[id][int(variant)-1] = 2
 
         with open(os.path.join(inputfolder, id+".json"), "w") as fp:
             json.dump(colormapcollection, fp)
@@ -78,11 +85,22 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 inputfolder = (config['CONFIG']['inputfolder'])
 orgfolder = (config['CONFIG']['originalfolder'])
+masterlist={}
+newsprites={}
 
 runColorMapper(orgfolder,inputfolder)
 runColorMapper(orgfolder, inputfolder,backFolder="back")
 runColorMapper(orgfolder, inputfolder,expFolder="exp")
 runColorMapper(orgfolder, inputfolder,expFolder="exp", backFolder="back")
+
+
+def findid(key):
+    numbers = re.findall(r"([0-9]+)",key[0])[0]
+    return int(numbers)
+
+with open(os.path.join(inputfolder, "masterlist.json"), "w") as fp:
+    json.dump(dict(sorted(masterlist.items(), key=findid)), fp)
+
 
 
 
