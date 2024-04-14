@@ -25,23 +25,24 @@ def getColoredPixels(img):
 
 def createColorMap(orgcolorlist, newcolorlist,name):
     if len(orgcolorlist) != len(newcolorlist):
-        print('images for #'+name+' do not have matching amount of nontransparant pixels org: ' +
+        print('images for '+name+' do not have matching amount of nontransparant pixels org: ' +
                          str(len(orgcolorlist))+' new: '+str(len(newcolorlist)))
         return False
     colormap = {}
     for i in range(len(orgcolorlist)):
         if (orgcolorlist[i] in colormap):
             if (colormap[orgcolorlist[i]] != newcolorlist[i]):
-                print(orgcolorlist[i] + ' is already mapped to ' +
+                print(orgcolorlist[i] + ' in '+name+' is already mapped to ' +
                                  colormap[orgcolorlist[i]] + ' but tried to also map to: ' + newcolorlist[i])
                 return False
         else:
             colormap[orgcolorlist[i]] = newcolorlist[i]
     return colormap    
 
-def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder=""):
+def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolder=""):
     
-    inputfolder = os.path.join(inputfolder,expFolder, backFolder)
+    inputfolder = os.path.join(inputfolder, expFolder,  backFolder,femfolder)
+    global masterlist
 
     filesToProcess = {}
     for file in os.listdir(inputfolder):
@@ -61,7 +62,7 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder=""):
     for id, variants in filesToProcess.items():
         colormapcollection = {}
         # use exp folder for mega/gigantamax
-        orgimagepath = (os.path.join(orgfolder, expFolder ,backFolder, (id+".png")))
+        orgimagepath = (os.path.join(orgfolder, expFolder, backFolder, femfolder,(id+".png")))
         
 
         orgcolorlist = getColoredPixels(Image.open(orgimagepath))
@@ -78,28 +79,41 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder=""):
 
         with open(os.path.join(inputfolder, id+".json"), "w") as fp:
             json.dump(colormapcollection, fp)
-
-
-
-config = configparser.ConfigParser()
-config.read('config.ini')
-inputfolder = (config['CONFIG']['inputfolder'])
-orgfolder = (config['CONFIG']['originalfolder'])
-masterlist={}
-newsprites={}
-
-runColorMapper(orgfolder,inputfolder)
-runColorMapper(orgfolder, inputfolder,backFolder="back")
-runColorMapper(orgfolder, inputfolder,expFolder="exp")
-runColorMapper(orgfolder, inputfolder,expFolder="exp", backFolder="back")
-
+    createMasterList(inputfolder)
+    
+    masterlist ={}
 
 def findid(key):
     numbers = re.findall(r"([0-9]+)",key[0])[0]
     return int(numbers)
 
-with open(os.path.join(inputfolder, "masterlist.json"), "w") as fp:
-    json.dump(dict(sorted(masterlist.items(), key=findid)), fp)
+def createMasterList(inputfolder):
+    with open(os.path.join(inputfolder, "_masterlist.json"), "w") as fp:
+        json.dump(dict(sorted(masterlist.items(), key=findid)), fp)
+
+config = configparser.ConfigParser()
+config.read('config.ini')
+inputfolder = (config['CONFIG']['inputfolder'])
+orgfolder = (config['CONFIG']['originalfolder'])
+masterlist = {}
+newsprites = {}
+
+#now that we have so many folders.. at this point should rewrite to dynamically get folderstructure
+runColorMapper(orgfolder, inputfolder)
+runColorMapper(orgfolder, inputfolder, femfolder="female")
+
+runColorMapper(orgfolder, inputfolder, backFolder="back")
+runColorMapper(orgfolder, inputfolder, femfolder="female", backFolder="back")
+
+runColorMapper(orgfolder, inputfolder, expFolder="exp")
+runColorMapper(orgfolder, inputfolder,femfolder="female", expFolder="exp")
+
+runColorMapper(orgfolder, inputfolder, expFolder="exp", backFolder="back")
+#female back exp images dont exist
+#runColorMapper(orgfolder, inputfolder, expFolder="exp",femfolder="female",  backFolder="back")
+
+
+
 
 
 
