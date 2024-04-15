@@ -40,10 +40,11 @@ def createColorMap(orgcolorlist, newcolorlist,name):
             colormap[orgcolorlist[i]] = newcolorlist[i]
     return colormap    
 
-def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolder=""):
+def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolder="",iconsfolder=""):
     
-    inputfolder = os.path.join(inputfolder, expFolder,  backFolder,femfolder)
+    inputfolder = os.path.join(inputfolder, iconsfolder, expFolder,  backFolder,femfolder)
     if (os.path.exists(inputfolder) != True):
+        os.makedirs(inputfolder, exist_ok=True)
         return
     newmasterlist = {}
 
@@ -66,7 +67,7 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
 
         colormapcollection = {}
         # use exp folder for mega/gigantamax
-        orgimagepath = (os.path.join(orgfolder, expFolder, backFolder, femfolder,(id+".png")))
+        orgimagepath = (os.path.join(orgfolder,iconsfolder, expFolder, backFolder, femfolder,(id+".png")))
 
         orgcolorlist = getColoredPixels(Image.open(orgimagepath))
 
@@ -109,6 +110,8 @@ newsprites = {}
 #now that we have so many folders.. at this point should rewrite to dynamically get folderstructure
 masterlist = runColorMapper(orgfolder, inputfolder)
 masterlist["female"] = runColorMapper(orgfolder, inputfolder, femfolder="female")
+
+masterlist["icons"] = runColorMapper(orgfolder, inputfolder, iconsfolder="icons")
 
 masterlist["back"] = runColorMapper(orgfolder, inputfolder, backFolder="back")
 masterlist["female"]["back"]=runColorMapper(orgfolder, inputfolder, femfolder="female", backFolder="back")
