@@ -44,7 +44,7 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
     inputfolder = os.path.join(inputfolder, expFolder,  backFolder,femfolder)
     if (os.path.exists(inputfolder) != True):
         return
-    global masterlist
+    newmasterlist = {}
 
     filesToProcess = {}
     for file in os.listdir(inputfolder):
@@ -52,7 +52,7 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
         if filename.endswith(".png"):
             idvariant = re.findall(r"([0-9]+[^_.]*)", filename)
             id = idvariant[0]
-            masterlist[id] = [0,0,0]
+            newmasterlist[id] = [0,0,0]
             variant = idvariant[1]
 
             if (id in filesToProcess):
@@ -62,9 +62,12 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
 
 
     for id, variants in filesToProcess.items():
+
         colormapcollection = {}
         # use exp folder for mega/gigantamax
         orgimagepath = (os.path.join(orgfolder, expFolder, backFolder, femfolder,(id+".png")))
+
+
         
 
         orgcolorlist = getColoredPixels(Image.open(orgimagepath))
@@ -75,16 +78,14 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
             tempcolormap = createColorMap(orgcolorlist, newcolorlist,id)
             if tempcolormap:
                 colormapcollection[int(variant)-1] = tempcolormap
-                masterlist[id][int(variant)-1]=1
+                newmasterlist[id][int(variant)-1] = 1
+                outputfolder = inputfolder.replace('input', 'output')
+                os.makedirs(outputfolder, exist_ok=True)
+                with open(os.path.join(outputfolder, id+".json"), "w") as fp:
+                    json.dump(colormapcollection, fp)
             else:
-                masterlist[id][int(variant)-1] = 2
-        outputfolder  = inputfolder.replace('input','output')
-        os.makedirs(outputfolder, exist_ok=True)
-        with open(os.path.join(outputfolder, id+".json"), "w") as fp:
-            json.dump(colormapcollection, fp)
-    createMasterList(inputfolder)
-    
-    masterlist ={}
+                newmasterlist[id][int(variant)-1] = 2
+    return dict(sorted(newmasterlist.items(), key=findid))
 
 def findid(key):
     numbers = re.findall(r"([0-9]+)",key[0])[0]
@@ -94,7 +95,7 @@ def createMasterList(inputfolder):
     outputfolder = inputfolder.replace('input', 'output')
     os.makedirs(outputfolder, exist_ok=True)
     with open(os.path.join(outputfolder, "_masterlist.json"), "w") as fp:
-        json.dump(dict(sorted(masterlist.items(), key=findid)), fp)
+        json.dump(masterlist, fp)
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -104,18 +105,20 @@ masterlist = {}
 newsprites = {}
 
 #now that we have so many folders.. at this point should rewrite to dynamically get folderstructure
-runColorMapper(orgfolder, inputfolder)
-runColorMapper(orgfolder, inputfolder, femfolder="female")
+masterlist = runColorMapper(orgfolder, inputfolder)
+masterlist["female"] = runColorMapper(orgfolder, inputfolder, femfolder="female")
 
-runColorMapper(orgfolder, inputfolder, backFolder="back")
-runColorMapper(orgfolder, inputfolder, femfolder="female", backFolder="back")
+masterlist["back"] = runColorMapper(orgfolder, inputfolder, backFolder="back")
+masterlist["female"]["back"]=runColorMapper(orgfolder, inputfolder, femfolder="female", backFolder="back")
 
-runColorMapper(orgfolder, inputfolder, expFolder="exp")
-runColorMapper(orgfolder, inputfolder,femfolder="female", expFolder="exp")
+masterlist["exp"] = runColorMapper(orgfolder, inputfolder, expFolder="exp")
+masterlist["exp"]["female"]=runColorMapper(orgfolder, inputfolder, femfolder="female", expFolder="exp")
 
-runColorMapper(orgfolder, inputfolder, expFolder="exp", backFolder="back")
+masterlist["exp"]["back"]=runColorMapper(orgfolder, inputfolder, expFolder="exp", backFolder="back")
 #female back exp images dont exist
 #runColorMapper(orgfolder, inputfolder, expFolder="exp",femfolder="female",  backFolder="back")
+
+createMasterList(inputfolder)
 
 
 
