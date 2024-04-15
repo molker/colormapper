@@ -78,8 +78,9 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
                 masterlist[id][int(variant)-1]=1
             else:
                 masterlist[id][int(variant)-1] = 2
-
-        with open(os.path.join(inputfolder, id+".json"), "w") as fp:
+        outputfolder  = inputfolder.replace('input','output')
+        os.makedirs(outputfolder, exist_ok=True)
+        with open(os.path.join(outputfolder, id+".json"), "w") as fp:
             json.dump(colormapcollection, fp)
     createMasterList(inputfolder)
     
@@ -90,7 +91,9 @@ def findid(key):
     return int(numbers)
 
 def createMasterList(inputfolder):
-    with open(os.path.join(inputfolder, "_masterlist.json"), "w") as fp:
+    outputfolder = inputfolder.replace('input', 'output')
+    os.makedirs(outputfolder, exist_ok=True)
+    with open(os.path.join(outputfolder, "_masterlist.json"), "w") as fp:
         json.dump(dict(sorted(masterlist.items(), key=findid)), fp)
 
 config = configparser.ConfigParser()
