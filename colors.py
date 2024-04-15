@@ -3,6 +3,7 @@ import json
 import configparser
 import os
 import re
+import shutil
 
 def rgb2hex(r, g, b):
     return '#{:02x}{:02x}{:02x}'.format(r, g, b)
@@ -82,6 +83,9 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
                     json.dump(colormapcollection, fp)
             else:
                 newmasterlist[id][int(variant)-1] = 2
+                outputfolder = inputfolder.replace('input', 'output')
+                os.makedirs(outputfolder, exist_ok=True)
+                shutil.copyfile(inputimagepath, os.path.join(outputfolder, id+"_"+variant+".png"))
     return dict(sorted(newmasterlist.items(), key=findid))
 
 def findid(key):
