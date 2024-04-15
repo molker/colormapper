@@ -42,6 +42,8 @@ def createColorMap(orgcolorlist, newcolorlist,name):
 def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolder=""):
     
     inputfolder = os.path.join(inputfolder, expFolder,  backFolder,femfolder)
+    if (os.path.exists(inputfolder) != True):
+        return
     global masterlist
 
     filesToProcess = {}
