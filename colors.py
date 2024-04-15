@@ -67,9 +67,6 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
         # use exp folder for mega/gigantamax
         orgimagepath = (os.path.join(orgfolder, expFolder, backFolder, femfolder,(id+".png")))
 
-
-        
-
         orgcolorlist = getColoredPixels(Image.open(orgimagepath))
 
         for variant in variants:
@@ -99,6 +96,7 @@ def createMasterList(inputfolder):
 
 config = configparser.ConfigParser()
 config.read('config.ini')
+zinputfolder = inputfolder = (config['CONFIG']['inputfolder'])
 inputfolder = (config['CONFIG']['inputfolder'])
 orgfolder = (config['CONFIG']['originalfolder'])
 masterlist = {}
@@ -115,10 +113,12 @@ masterlist["exp"] = runColorMapper(orgfolder, inputfolder, expFolder="exp")
 masterlist["exp"]["female"]=runColorMapper(orgfolder, inputfolder, femfolder="female", expFolder="exp")
 
 masterlist["exp"]["back"]=runColorMapper(orgfolder, inputfolder, expFolder="exp", backFolder="back")
+
+
 #female back exp images dont exist
 #runColorMapper(orgfolder, inputfolder, expFolder="exp",femfolder="female",  backFolder="back")
 
-createMasterList(inputfolder)
+createMasterList(zinputfolder)
 
 
 
