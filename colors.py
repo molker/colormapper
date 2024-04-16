@@ -45,7 +45,7 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
     inputfolder = os.path.join(inputfolder, iconsfolder, expFolder,  backFolder,femfolder)
     if (os.path.exists(inputfolder) != True):
         os.makedirs(inputfolder, exist_ok=True)
-        return
+        return {}
     newmasterlist = {}
 
     filesToProcess = {}
