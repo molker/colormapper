@@ -114,7 +114,8 @@ masterlist["female"] = runColorMapper(orgfolder, inputfolder, femfolder="female"
 masterlist["icons"] = runColorMapper(orgfolder, inputfolder, iconsfolder="icons")
 
 masterlist["back"] = runColorMapper(orgfolder, inputfolder, backFolder="back")
-masterlist["female"]["back"]=runColorMapper(orgfolder, inputfolder, femfolder="female", backFolder="back")
+masterlist["back"]["female"] = runColorMapper(
+    orgfolder, inputfolder, femfolder="female", backFolder="back")
 
 masterlist["exp"] = runColorMapper(orgfolder, inputfolder, expFolder="exp")
 masterlist["exp"]["female"]=runColorMapper(orgfolder, inputfolder, femfolder="female", expFolder="exp")
