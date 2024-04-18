@@ -126,7 +126,6 @@ newsprites = {}
 masterlist = runColorMapper(orgfolder, inputfolder)
 masterlist["female"] = runColorMapper(orgfolder, inputfolder, femfolder="female")
 
-masterlist["icons"] = runColorMapper(orgfolder, inputfolder, iconsfolder="icons")
 
 masterlist["back"] = runColorMapper(orgfolder, inputfolder, backFolder="back")
 masterlist["back"]["female"] = runColorMapper(
