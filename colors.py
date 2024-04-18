@@ -68,6 +68,8 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
         colormapcollection = {}
         # use exp folder for mega/gigantamax
         orgimagepath = (os.path.join(orgfolder,iconsfolder, expFolder, backFolder, femfolder,(id+".png")))
+        orgjsonpath = (os.path.join(orgfolder, iconsfolder,
+                        expFolder, backFolder, femfolder, (id+".json")))
 
         orgcolorlist = getColoredPixels(Image.open(orgimagepath))
 
@@ -88,7 +90,7 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
                 os.makedirs(outputfolder, exist_ok=True)
                 shutil.copyfile(inputimagepath, os.path.join(outputfolder, id+"_"+variant+".png"))
                 #shutil.copyfile(os.path.join(orgfolder,id+".json"), os.path.join(outputfolder, id+"_"+variant+".json"))
-                with open(os.path.join(orgfolder,id+".json"), "r") as fp:
+                with open(os.path.join(orgjsonpath), "r") as fp:
                     atlas = json.load(fp)
                     atlas["textures"][0]["image"] = id+"_"+variant+".png"
                     with open(os.path.join(os.path.join(
