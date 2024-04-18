@@ -26,14 +26,14 @@ def getColoredPixels(img):
 
 def createColorMap(orgcolorlist, newcolorlist,name):
     if len(orgcolorlist) != len(newcolorlist):
-        print('images for '+name+' do not have matching amount of nontransparant pixels org: ' +
+        print(name + ' is sprite replacement: does not have matching amount of nontransparant pixels org: ' +
                          str(len(orgcolorlist))+' new: '+str(len(newcolorlist)))
         return False
     colormap = {}
     for i in range(len(orgcolorlist)):
         if (orgcolorlist[i] in colormap):
             if (colormap[orgcolorlist[i]] != newcolorlist[i]):
-                print(orgcolorlist[i] + ' in '+name+' is already mapped to ' +
+                print(name + " is sprite replacement: "+orgcolorlist[i] + ' is already mapped to ' +
                                  colormap[orgcolorlist[i]] + ' but tried to also map to: ' + newcolorlist[i])
                 return False
         else:
@@ -74,19 +74,29 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
         for variant in variants:
             inputimagepath = (os.path.join(inputfolder, (id+"_"+variant+".png")))
             newcolorlist = getColoredPixels(Image.open(inputimagepath))
-            tempcolormap = createColorMap(orgcolorlist, newcolorlist,id)
+            tempcolormap = createColorMap(orgcolorlist, newcolorlist,inputimagepath.replace(zinputfolder+'\\',''))
             if tempcolormap:
                 colormapcollection[int(variant)-1] = tempcolormap
                 newmasterlist[id][int(variant)-1] = 1
                 outputfolder = inputfolder.replace('input', 'output')
                 os.makedirs(outputfolder, exist_ok=True)
                 with open(os.path.join(outputfolder, id+".json"), "w") as fp:
-                    json.dump(colormapcollection, fp)
+                    json.dump(colormapcollection, fp,indent="\t")
             else:
                 newmasterlist[id][int(variant)-1] = 2
                 outputfolder = inputfolder.replace('input', 'output')
                 os.makedirs(outputfolder, exist_ok=True)
                 shutil.copyfile(inputimagepath, os.path.join(outputfolder, id+"_"+variant+".png"))
+                #shutil.copyfile(os.path.join(orgfolder,id+".json"), os.path.join(outputfolder, id+"_"+variant+".json"))
+                with open(os.path.join(orgfolder,id+".json"), "r") as fp:
+                    atlas = json.load(fp)
+                    atlas["textures"][0]["image"] = id+"_"+variant+".png"
+                    with open(os.path.join(os.path.join(
+                    outputfolder, id+"_"+variant+".json")), "w") as fp:
+                        json.dump(atlas,fp,indent="\t")
+        
+                
+
     return dict(sorted(newmasterlist.items(), key=findid))
 
 def findid(key):
@@ -97,12 +107,15 @@ def createMasterList(inputfolder):
     outputfolder = inputfolder.replace('input', 'output')
     os.makedirs(outputfolder, exist_ok=True)
     with open(os.path.join(outputfolder, "_masterlist.json"), "w") as fp:
-        json.dump(masterlist, fp)
+        json.dump(masterlist, fp, indent="\t")
+
+
+
 
 config = configparser.ConfigParser()
 config.read('config.ini')
-zinputfolder = inputfolder = (config['CONFIG']['inputfolder'])
 inputfolder = (config['CONFIG']['inputfolder'])
+zinputfolder = (config['CONFIG']['inputfolder'])
 orgfolder = (config['CONFIG']['originalfolder'])
 masterlist = {}
 newsprites = {}
