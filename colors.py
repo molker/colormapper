@@ -26,6 +26,7 @@ def getColoredPixels(img):
 
 def createColorMap(orgcolorlist, newcolorlist,name):
     if len(orgcolorlist) != len(newcolorlist):
+        spritereplacements += 1
         print(name + ' is sprite replacement: does not have matching amount of nontransparant pixels org: ' +
                          str(len(orgcolorlist))+' new: '+str(len(newcolorlist)))
         return False
@@ -33,6 +34,7 @@ def createColorMap(orgcolorlist, newcolorlist,name):
     for i in range(len(orgcolorlist)):
         if (orgcolorlist[i] in colormap):
             if (colormap[orgcolorlist[i]] != newcolorlist[i]):
+                spritereplacements+=1
                 print(name + " is sprite replacement: "+orgcolorlist[i] + ' is already mapped to ' +
                                  colormap[orgcolorlist[i]] + ' but tried to also map to: ' + newcolorlist[i])
                 return False
@@ -55,7 +57,11 @@ def runColorMapper(orgfolder, inputfolder, backFolder ="", expFolder="",femfolde
             idvariant = re.findall(r"([0-9]+[^_.]*)", filename)
             id = idvariant[0]
             newmasterlist[id] = [0,0,0]
-            variant = idvariant[1]
+            try:
+                variant = idvariant[1]
+            except:
+                wrongfiles.append(os.path.join(inputfolder,file))
+                break
 
             if (id in filesToProcess):
                 filesToProcess[id].append(variant)
@@ -121,6 +127,8 @@ zinputfolder = (config['CONFIG']['inputfolder'])
 orgfolder = (config['CONFIG']['originalfolder'])
 masterlist = {}
 newsprites = {}
+spritereplacements = 0
+wrongfiles = []
 
 #now that we have so many folders.. at this point should rewrite to dynamically get folderstructure
 masterlist = runColorMapper(orgfolder, inputfolder)
@@ -141,6 +149,10 @@ masterlist["exp"]["back"]=runColorMapper(orgfolder, inputfolder, expFolder="exp"
 #runColorMapper(orgfolder, inputfolder, expFolder="exp",femfolder="female",  backFolder="back")
 
 createMasterList(zinputfolder)
+
+print("Finished \nSprite replacements: "+spritereplacements+"\nWrong files:")
+for i in wrongfiles:
+    print(i)
 
 
 
