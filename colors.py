@@ -151,7 +151,7 @@ masterlist["exp"]["back"]=runColorMapper(orgfolder, inputfolder, expFolder="exp"
 
 createMasterList(zinputfolder)
 
-print("Finished \nSprite replacements: "+spritereplacements+"\nWrong files:")
+print("Finished \nSprite replacements: "+str(spritereplacements)+"\nWrong files:")
 for i in wrongfiles:
     print(i)
 
