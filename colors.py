@@ -25,6 +25,7 @@ def getColoredPixels(img):
 
 
 def createColorMap(orgcolorlist, newcolorlist,name):
+    global spritereplacements
     if len(orgcolorlist) != len(newcolorlist):
         spritereplacements += 1
         print(name + ' is sprite replacement: does not have matching amount of nontransparant pixels org: ' +
@@ -34,7 +35,7 @@ def createColorMap(orgcolorlist, newcolorlist,name):
     for i in range(len(orgcolorlist)):
         if (orgcolorlist[i] in colormap):
             if (colormap[orgcolorlist[i]] != newcolorlist[i]):
-                spritereplacements+=1
+                spritereplacements +=1
                 print(name + " is sprite replacement: "+orgcolorlist[i] + ' is already mapped to ' +
                                  colormap[orgcolorlist[i]] + ' but tried to also map to: ' + newcolorlist[i])
                 return False
